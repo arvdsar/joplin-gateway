@@ -1,6 +1,6 @@
-FROM node:19-bullseye-slim
+FROM node:20.1.0-bullseye-slim
 
-LABEL maintainer="nick@jeffri.es"
+LABEL maintainer="alexander@vdsar.net"
 
 # This docker file automatically installs joplin + email gateway and file scanning scripts and starts
 # forwarding notes
@@ -32,13 +32,17 @@ RUN adduser node crontab
 
 USER node
 
-RUN mkdir -p /home/node/joplin-mailbox/new
+RUN mkdir -p /home/node/joplin-mailbox/new 
 RUN mkdir -p /home/node/joplin-mailbox/cur
 RUN mkdir -p /home/node/joplin-mailbox/tmp
 RUN mkdir -p /home/node/joplin-file-scan
-
 COPY --chown=node:node . /home/node
-RUN /home/node/expose-config.sh
+
+USER 0
+RUN chmod 755 /home/node/expose-config.sh
+USER node
+
+RUN  /home/node/expose-config.sh
 RUN ln -s /home/node/.config/config-defaults.sh /home/node/config-defaults.sh
 RUN touch /home/node/scan.log
 
