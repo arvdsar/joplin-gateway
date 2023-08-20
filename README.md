@@ -30,7 +30,7 @@ In order to ensure you have persistence in regards to configuration and content 
 
 ```
   joplin-gateway:
-    image: nickzeff/joplin-gateway:latest
+    image: mrmadalex/joplin-gateway:latest
     container_name: joplin-gateway
     environment:
       - PUID=1000
