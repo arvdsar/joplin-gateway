@@ -1,5 +1,10 @@
 # joplin-gateway
 
+## UPDATE
+This is a slightly modified version of the version of Nick who builds the images for ARM while I have to build them for X86/AMD64 to be compatible with my Synology NAS and NUC running on Intel processors.
+
+I had to make some updates to the dockerfile to make sure the images build properly. 
+
 ## Overview
 Simple (bash-based) mail gateway and file scan for the open source note taking and to-do application
 [Joplin](https://joplin.cozic.net/).
@@ -134,4 +139,4 @@ I will try to expand this section if required, but if you are experiencing diffi
 ## Todo
 
 - Provide better documentation
-- Slim down the image - currently way too large at >800MB!
+- Slim down the image - this is reduced slightly in latest version by using alpine... but not much

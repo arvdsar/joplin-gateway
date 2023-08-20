@@ -3,7 +3,7 @@
 # ---------- Configuration ---------------
 
 DEFAULT_TITLE_PREFIX="New Note"
-DEFAULT_NOTEBOOK="Default Notebook Name"
+DEFAULT_NOTEBOOK="InBox"
 AUTO_CREATE_NOTEBOOK=false
 LOCKFILE_DURATION=600
 MAX_THUMBNAILS=1

@@ -1,8 +1,8 @@
 [retriever]
 type = SimplePOP3SSLRetriever
-server = pop.gmail.com
-username = username-goes-here
-password = password-goes-here
+server = your.mail.server
+username = your-user-name
+password = your-email-password
 port = 995
 
 [destination]
@@ -20,8 +20,8 @@ delivered_to = false
 # ditto
 received = false
 
-# do not delete emails on server
-delete = false
+# do not delete emails on server (I delete them after processing)
+delete = true
 
 # max downloaded each time; use 0 for no limit
 max_messages_per_session = 5
