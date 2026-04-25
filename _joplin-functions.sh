@@ -84,7 +84,13 @@ function determineMailPartType {
     elif [[ "$1" =~ ^.*\.gif$ ]] ; then
         echo "IMG"
     else
-        echo "UNKNOWN"
+        local EXT="${1##*.}"
+        EXT="${EXT,,}"
+        if [[ -n "$MARKITDOWN_EXTENSIONS" && ",${MARKITDOWN_EXTENSIONS}," == *",${EXT},"* ]] ; then
+            echo "DOC"
+        else
+            echo "UNKNOWN"
+        fi
     fi
 }
 
@@ -164,6 +170,8 @@ function addAttachmentFromFile {
     elif [[ "$T" == "IMG" ]] ; then
         attachFile "$1" "$2"
         #addLastImageAsLink "$1"
+    elif [[ "$T" == "DOC" ]] ; then
+        attachFile "$1" "$2"
     elif [[ "$T" == "UNKNOWN" ]] ; then
         attachFile "$1" "$2"
     else
@@ -181,15 +189,27 @@ function addAttachmentsFromFileParts {
 }
 
 #---
-## Usage: addPdfFulltext note-id pdf-file
+## Usage: addMarkitdownFulltext note-id file
 #---
-function addPdfFulltext {
-	echo "$LOG_PREFIX Add pdf fulltext for `basename "$2"`"
-	pdftotext -raw -nopgbrk "$2" "$TEMP_APPEND_FILE"
+function addMarkitdownFulltext {
+    if [[ "${MARKITDOWN_ENABLED}" == "false" ]]; then return 0; fi
 
-    if [[ -f $TEMP_APPEND_FILE ]]; then
-        joplin edit $1
+    echo "$LOG_PREFIX Convert with markitdown: `basename "$2"`"
+    local ERR_FILE
+    ERR_FILE=$(mktemp)
+    if timeout 120 markitdown "$2" >"$TEMP_APPEND_FILE" 2>"$ERR_FILE"; then
+        if [[ -s "$TEMP_APPEND_FILE" ]]; then
+            joplin edit "$1"
+        else
+            echo "$LOG_PREFIX markitdown produced empty output for `basename "$2"` - skipping body update"
+            rm -f "$TEMP_APPEND_FILE"
+        fi
+    else
+        echo "$LOG_PREFIX markitdown failed (or timed out) for `basename "$2"`:"
+        cat "$ERR_FILE"
+        rm -f "$TEMP_APPEND_FILE"
     fi
+    rm -f "$ERR_FILE"
 }
 
 #---
@@ -210,9 +230,11 @@ function addImageFulltext {
 function addFulltextFromFile {
     local T=`determineMailPartType "$2"`
     if [[ "$T" == "PDF" ]] ; then
-        addPdfFulltext "$1" "$2"
+        addMarkitdownFulltext "$1" "$2"
     elif [[ "$T" == "IMG" ]] ; then
         addImageFulltext "$1" "$2"
+    elif [[ "$T" == "DOC" ]] ; then
+        addMarkitdownFulltext "$1" "$2"
     else
         :
     fi

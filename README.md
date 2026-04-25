@@ -22,6 +22,19 @@ The key changes are:
 - The system now supports a scheduled filescan of a "hot folder" and a pop request to a provider of your choice. Cron has been set up for checks every minute, but locks are in place to prevent overlapping scripts
 - Bash limitations throwing errors when building longer notes have been overcome by making changes outside Joplin in the filesystem rather than through string expansion. 
 
+## Document conversion via markitdown
+
+Incoming documents are auto-converted to Markdown using Microsoft [markitdown](https://github.com/microsoft/markitdown). The Markdown is appended to the note body and the **original file is always kept as an attachment**, so nothing is lost.
+
+Formats handled out of the box: `.docx`, `.pptx`, `.xlsx`, `.xls`, `.html`/`.htm`, `.csv`, `.epub`, `.msg`, `.json`, `.xml`, `.odt`, plus PDFs (markitdown replaces the previous raw `pdftotext` step). Images continue to use `tesseract` for OCR. The extension list lives in `MARKITDOWN_EXTENSIONS` in `config-defaults.sh` — edit it to taste. Set `MARKITDOWN_ENABLED=false` to turn the feature off entirely.
+
+A few things worth knowing:
+
+- **Body order** — the converted Markdown is appended at the end of the note body, after any email text and the attachment link. This matches how `pdftotext` output was positioned previously.
+- **Scanned PDFs** — markitdown extracts text from PDFs but does not OCR image-only pages, same as the old `pdftotext` flow. Scanned-only PDFs will produce an empty conversion; the original file is still attached.
+- **Embedded images in `.docx`/`.pptx`** — markitdown emits `![](...)` references that point to extracted images. The references are not currently resolved into Joplin resources, so they may render as broken-image placeholders. Cosmetic only.
+- **Existing installs** — if you already have a `config-defaults.sh` from a previous version, the `expose-config.sh` job will append the two new `MARKITDOWN_*` keys on its next run without disturbing your other settings.
+
 ## First Run
 
 I use a combination of docker-compose and Portainer for my "production" image/container administration. I make reference to these below, but please adapt to your toolset of choice.
@@ -71,6 +84,16 @@ LOCKFILE_DURATION=600
 
 # Maximum number of thumbnails to generate from a PDF. Set to a very high number if you really like lots of thumbnails (I don't). Value of 0 means no thumbnails.
 MAX_THUMBNAILS=1
+
+# Convert incoming documents (and PDFs) to Markdown for the note body using
+# Microsoft markitdown. The original file is always still attached.
+# Set to "false" to disable.
+MARKITDOWN_ENABLED=true
+
+# Comma-separated lowercase extensions handled by markitdown. Must match what
+# the markitdown extras installed in the Dockerfile actually support.
+# PDFs and images are routed separately and do NOT belong in this list.
+MARKITDOWN_EXTENSIONS="docx,pptx,xlsx,xls,html,htm,csv,epub,msg,json,xml,odt"
 
 # ---------- Advanced Configuration ------
 

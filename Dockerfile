@@ -27,6 +27,19 @@ RUN python3 -m venv yacronenv && \
 	. yacronenv/bin/activate && \
     pip install yacron
 
+# Install Microsoft markitdown into a dedicated venv for converting incoming
+# documents to Markdown. Build deps are pulled in only for the install step
+# and removed in the same RUN so they do not bloat the final image.
+RUN apk add --no-cache --virtual .markitdown-build-deps \
+        build-base libffi-dev openssl-dev cargo rust \
+        jpeg-dev zlib-dev freetype-dev tiff-dev \
+        libxml2-dev libxslt-dev \
+ && apk add --no-cache libxml2 libxslt libjpeg-turbo zlib freetype tiff \
+ && python3 -m venv /markitdownenv \
+ && /markitdownenv/bin/pip install --no-cache-dir \
+        'markitdown[pdf,docx,pptx,xlsx,xls,outlook,epub]' \
+ && apk del .markitdown-build-deps
+
 
 USER node
 
@@ -62,6 +75,7 @@ RUN chmod +x /home/node/proxy-joplin-editor.sh
 
 # Link joplin so can be called via single command, and expose ports which may be used for sync provider first time setup
 RUN ln -s /home/node/.npm-global/bin/joplin /usr/bin/joplin
+RUN ln -s /markitdownenv/bin/markitdown /usr/bin/markitdown
 EXPOSE 8967
 EXPOSE 9967
 

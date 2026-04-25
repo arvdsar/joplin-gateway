@@ -15,3 +15,25 @@ if [ ! -d /home/node/.config/joplin ]; then
     echo "`date`: Re-creating default joplin configuration"
     cp -r /home/node/defaults/joplin /home/node/.config/
 fi
+
+# Append any default config keys the user's existing config-defaults.sh is
+# missing. Never overwrites a user-set value; only appends absent keys so
+# new features (e.g. MARKITDOWN_*) reach existing installations.
+USER_CONFIG=/home/node/.config/config-defaults.sh
+DEFAULTS_CONFIG=/home/node/defaults/config-defaults.sh
+if [ -f "$USER_CONFIG" ] && [ -f "$DEFAULTS_CONFIG" ]; then
+    while IFS= read -r LINE; do
+        case "$LINE" in
+            ''|'#'*) continue ;;
+        esac
+        case "$LINE" in
+            *=*) ;;
+            *) continue ;;
+        esac
+        KEY="${LINE%%=*}"
+        if ! grep -qE "^[[:space:]]*${KEY}=" "$USER_CONFIG"; then
+            echo "`date`: Adding missing config key to $USER_CONFIG: $KEY"
+            printf '\n%s\n' "$LINE" >> "$USER_CONFIG"
+        fi
+    done < "$DEFAULTS_CONFIG"
+fi
