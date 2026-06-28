@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:20-alpine
 
 LABEL maintainer="nick@jeffri.es"
 
@@ -9,23 +9,22 @@ LABEL maintainer="nick@jeffri.es"
 
 RUN apk update
 
+# Use the stable Alpine python3 (3.12) shipped with the base image. Do NOT pull
+# python from edge: edge ships 3.14, which breaks yacron (asyncio.get_event_loop).
 RUN apk add --update --no-cache \
-    bash nodejs npm poppler-utils tesseract-ocr ripmime curl
-
-RUN apk add --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/ \
-    python3
-
-RUN apk add --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-    getmail6
-
-#install pip for alpine    
-RUN apk add py3-pip
-
+    bash nodejs npm poppler-utils tesseract-ocr ripmime curl \
+    python3 py3-pip
 
 # crond needs root on alpine, so install replacement yacron instead which will allow to be run as node user
-RUN python3 -m venv yacronenv && \
-	. yacronenv/bin/activate && \
-    pip install yacron
+RUN python3 -m venv /yacronenv && \
+    /yacronenv/bin/pip install --no-cache-dir yacron
+
+# getmail6 is not packaged in the stable Alpine repos (only edge/testing, which
+# forces python 3.14). Install it from PyPI into its own venv and expose the
+# `getmail` entry point on PATH.
+RUN python3 -m venv /getmailenv && \
+    /getmailenv/bin/pip install --no-cache-dir getmail6 && \
+    ln -s /getmailenv/bin/getmail /usr/bin/getmail
 
 # Install Microsoft markitdown into a dedicated venv for converting incoming
 # documents to Markdown. Build deps are pulled in only for the install step

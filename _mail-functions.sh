@@ -9,17 +9,17 @@ function getMailSubject {
 
 ## Usage: getTitleFromSubject subject
 function getTitleFromSubject {
-    echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.sub("(#\w+\s*)","",s); s=re.sub(r"(@\w+\s*)","",s); print(s);'
+    echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.sub(r"(#\w+\s*)","",s); s=re.sub(r"(@\w+\s*)","",s); print(s);'
 }
 
 ## Usage: getTagsFromSubject subject
 function getTagsFromSubject {
-    echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.findall("(?:#)(\w+)",s); print(" ".join(s));'
+    echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.findall(r"(?:#)(\w+)",s); print(" ".join(s));'
 }
 
 ## Usage: getNotebookFromSubject subject default-notebook
 function getNotebookFromSubject {
-    local NB=`echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.search("@(\w+)",s); print(s.group(1)) if s is not None else print("")'`
+    local NB=`echo -n "$1" | python3 -c 'import sys,re; s=sys.stdin.read(); s=re.search(r"@(\w+)",s); print(s.group(1)) if s is not None else print("")'`
     if [[ "${NB}x" == "x" ]]; then
         echo "$2"
     else
