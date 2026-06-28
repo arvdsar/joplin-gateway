@@ -1,7 +1,8 @@
-# joplin-gateway
+# joplin-gateway with Markitdown
 
 ## UPDATE
-This is a slightly modified version of the version of Nick who builds the images for ARM while I have to build them for X86/AMD64 to be compatible with my Synology NAS and NUC running on Intel processors.
+This is inspired on the version of Nick but I had to get this working for X86/AMD64  to run this on my Synology NAS and NUC running Intel Processors.
+This is a new version includes MS MarkItDown which converts several document types to Markdown. Updated this with Claude Code.
 
 I had to make some updates to the dockerfile to make sure the images build properly. 
 
@@ -11,7 +12,7 @@ Simple (bash-based) mail gateway and file scan for the open source note taking a
 
 It is **significantly** based on the original joplin-mail-gateway here: https://github.com/manolitto/joplin-mail-gateway. Many thanks should be directed to manolitto for investing the time to build the original version.
 
-I have pre-built an (admittedly sizeable) image which runs on arm64 architectures, so you can run it on your raspberry pi (like I do). Grab [nickzeff/joplin-gateway:latest](https://hub.docker.com/repository/docker/nickzeff/joplin-gateway/general) from docker hub.
+if you look to the version of Nick which runs on arm64 architectures, so you can run it on your raspberry pi. Grab [nickzeff/joplin-gateway:latest](https://hub.docker.com/repository/docker/nickzeff/joplin-gateway/general) from docker hub.
 
 ## Major Changes
 
@@ -43,7 +44,7 @@ In order to ensure you have persistence in regards to configuration and content 
 
 ```
   joplin-gateway:
-    image: mrmadalex/joplin-gateway:latest
+    image: mrmadalex/joplin-gateway-markitdown:latest
     container_name: joplin-gateway
     environment:
       - PUID=1000
