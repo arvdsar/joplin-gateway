@@ -1,5 +1,7 @@
 # joplin-gateway
 
+Check out the feature branch which includes MarkItDown from MS to convert all kind of documents towards MarkDown. The Master will not be maintained anymore.
+Get the updated images from docker: https://hub.docker.com/repository/docker/mrmadalex/joplin-gateway-markitdown/general
 ## UPDATE
 This is a slightly modified version of the version of Nick who builds the images for ARM while I have to build them for X86/AMD64 to be compatible with my Synology NAS and NUC running on Intel processors.
 
